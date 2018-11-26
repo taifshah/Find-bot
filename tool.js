@@ -111,6 +111,10 @@ class Tool {
 
         return parts.join(` `)
     }
+
+    static calculateAccountEstimatedValue(account, gp) {
+
+    }
 }
 
 module.exports.Tool = Tool;

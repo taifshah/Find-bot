@@ -1,6 +1,7 @@
 let instance = null
     , sprintf = require(`sprintf-js`).sprintf
     , moment = require(`moment`)
+    , config = require(`./config`)
     , messages = require(`./messages`)
     , Adapter = require(`./adapter`).Adapter
     , Tool = require(`./tool`).Tool
@@ -18,9 +19,37 @@ class BotHelper {
         return instance;
     }
 
-    handleAccountInfoCommand(username, params, message) {
+    updateStatus(bot) {
+        bot.user.setActivity(`Say ??help`, { type: `WATCHING` });
+    }
+
+    handleCommand(command, params, message) {
+        switch (command) {
+            case `help`:
+            case `info`:
+                this.handleHelpCommand(message);
+                break;
+            case `account_info`:
+                this.handleAccountInfoCommand(params, message);
+                break;
+            default:
+                console.info(sprintf(`Unsupported "%s" command received.`, command));
+        }
+    }
+
+    handleHelpCommand(message) {
+        message.channel.send(sprintf(messages.info, message.author.id, config.commandPrefix))
+    }
+
+    handleAccountInfoCommand(params, message) {
+        if (params.length < 1) {
+            console.error(`Don't receive account username...`);
+
+            return;
+        }
+
         Adapter.instance().processAccountDetails(
-            username,
+            params[0],
             (account, gp) => {
                 message.channel.send(sprintf(
                     messages.accountInfo,

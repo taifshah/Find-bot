@@ -8,6 +8,8 @@ let Discord = require(`discord.js`)
 
 bot.on(`ready`, () => {
     console.info('Bot has started');
+
+    BotHelper.instance().updateStatus(bot);
 });
 
 bot.on(`message`, message => {
@@ -21,12 +23,19 @@ bot.on(`message`, message => {
         return; // ignore not command messages
     }
 
-    let parts = message.content.substr(1).split(` `)
-        , username = parts[0]
-        , params = parts.splice(1)
+    let commandName = null
+        , params = []
     ;
+    if (message.content[1] !== config.commandPrefix) {
+        commandName = `account_info`;
+        params = message.content.substr(1).split(` `);
+    } else {
+        let parts = message.content.substr(2).split(` `);
+        commandName = parts[0];
+        params = parts.splice(1);
+    }
 
-    BotHelper.instance().handleAccountInfoCommand(username, params, message);
+    BotHelper.instance().handleCommand(commandName, params, message);
 });
 
 bot.login(config.botToken);
